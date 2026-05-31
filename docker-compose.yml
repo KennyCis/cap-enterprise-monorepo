@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # 1. Base de Datos Relacional Principal
+  # 1. Base de Datos
   postgres:
     image: postgres:15-alpine
     container_name: cap-postgres
@@ -14,14 +14,14 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  # 2. Redis (Para caché y bloqueos de reservas concurrentes)
+  # 2. Redis
   redis:
     image: redis:7-alpine
     container_name: cap-redis
     ports:
       - "6379:6379"
 
-  # 3. Zookeeper (Requisito para que Kafka funcione)
+  # 3. Zookeeper
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     container_name: cap-zookeeper
@@ -29,7 +29,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 
-  # 4. Apache Kafka (El Bus de Eventos)
+  # 4. Kafka
   kafka:
     image: confluentinc/cp-kafka:latest
     container_name: cap-kafka
@@ -43,20 +43,48 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
-  # 5. Kong API Gateway (Modo DB-less para agilidad)
-  kong:
-    image: kong:latest
-    container_name: cap-api-gateway
+  # 5. Auth Microservice (Node.js)
+  auth-service:
+    build:
+      context: ./backend/auth-service
+    container_name: cap-auth-service
     environment:
-      KONG_DATABASE: "off"
-      KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_ADMIN_ERROR_LOG: /dev/stderr
-      KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
+      - PORT=3001
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=admin
+      - DB_PASSWORD=adminpassword
+      - DB_NAME=cap_db
+      - JWT_SECRET=super_secret_cap_token_2024
+    depends_on:
+      - postgres
+
+  # 6. Room Microservice (Python)
+  room-service:
+    build:
+      context: ./backend/room-service
+    container_name: cap-room-service
+    environment:
+      - PORT=8002
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=admin
+      - DB_PASSWORD=adminpassword
+      - DB_NAME=cap_db
+    depends_on:
+      - postgres
+
+  # 7. Custom API Gateway (Nginx)
+  nginx-gateway:
+    image: nginx:alpine
+    container_name: cap-api-gateway
     ports:
-      - "8000:8000" # Puerto público para el Frontend
-      - "8001:8001" # Puerto de administración (Solo nosotros)
+      - "8000:8000"
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - auth-service
+      - room-service
 
 volumes:
   pgdata:
