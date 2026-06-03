@@ -1,4 +1,4 @@
-name: Desarrollo - Build & Push a Docker Hub
+name: Dev - Build & Push to Docker Hub
 
 on:
   push:
@@ -9,33 +9,31 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Descargar código del repositorio
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: 🔑 Iniciar sesión en Docker Hub
+      - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_KENNYCIS }}
           password: ${{ secrets.DOCKER_KENNYCISPASSWORD }}
 
-      - name: 🔐 Construir y Subir Auth Service
+      - name: Build and Push Auth Service
         run: |
-          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:dev ./backend/auth-service || docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:dev ./auth-service
+          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:dev ./auth-service
           docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:dev
 
-      - name: 🏫 Construir y Subir Room Service
+      - name: Build and Push Room Service
         run: |
-          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev ./backend/room-service || docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev ./room-service
+          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev ./room-service
           docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev
 
-      # --- LOS 2 NUEVOS MICROSERVICIOS CON LAS RUTAS CORREGIDAS ---
-      
-      - name: 📅 Construir y Subir Reservation Service
+      - name: Build and Push Reservation Service
         run: |
-          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-reservation-service:dev ./backend/reservations-service || docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-reservation-service:dev ./reservations-service
+          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-reservation-service:dev ./reservation-service
           docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-reservation-service:dev
 
-      - name: 🔔 Construir y Subir Notification Service
+      - name: Build and Push Notification Service
         run: |
-          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:dev ./backend/notifications-service || docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:dev ./notifications-service
+          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:dev ./notification-service
           docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:dev
