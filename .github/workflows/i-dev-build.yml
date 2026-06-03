@@ -18,12 +18,6 @@ jobs:
           username: ${{ secrets.DOCKER_KENNYCIS }}
           password: ${{ secrets.DOCKER_KENNYCISPASSWORD }}
 
-      # REGLA 2: Solo aquí se hace el Build y el Push
-      - name: ⚙️ Construir y Subir API Gateway (Nginx)
-        run: |
-          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-api-gateway:dev -f nginx/Dockerfile . || docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-api-gateway:dev ./nginx
-          docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-api-gateway:dev
-
       - name: 🔐 Construir y Subir Auth Service
         run: |
           docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:dev ./backend/auth-service || docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:dev ./auth-service
