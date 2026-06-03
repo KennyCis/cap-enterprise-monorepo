@@ -1,15 +1,9 @@
-name: CAP Enterprise CI/CD Pipeline
+name: Dev - Build and Push Docker Images
 
 on:
   push:
     branches:
-      - main
-      - qa
       - develop
-  pull_request:
-    branches:
-      - main
-      - qa
 
 jobs:
   build-and-push:
@@ -31,11 +25,25 @@ jobs:
         with:
           context: ./backend/auth-service
           push: true
-          tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:latest
+          tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:dev
 
       - name: Build and Push Room Service
         uses: docker/build-push-action@v5
         with:
           context: ./backend/room-service
           push: true
-          tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:latest
+          tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev
+
+      - name: Build and Push Reservations Service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/reservations-service
+          push: true
+          tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-reservation-service:dev
+
+      - name: Build and Push Notifications Service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/notifications-service
+          push: true
+          tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:dev
