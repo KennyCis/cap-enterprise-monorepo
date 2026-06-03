@@ -1,0 +1,29 @@
+name: Prod - Promoción de Imágenes (QA -> Main)
+
+# REGLA 5: Solo se enciende al aprobar el Pull Request hacia 'main'
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  promote-to-prod:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔑 Iniciar sesión en Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_KENNYCIS }}
+          password: ${{ secrets.DOCKER_KENNYCISPASSWORD }}
+
+      - name: 🏷️ Promover Auth Service a Producción
+        run: |
+          docker pull ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:qa
+          docker tag ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:qa ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:prod
+          docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:prod
+
+      - name: 🏷️ Promover Room Service a Producción
+        run: |
+          docker pull ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:qa
+          docker tag ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:qa ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:prod
+          docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:prod
