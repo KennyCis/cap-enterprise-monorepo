@@ -1,0 +1,35 @@
+name: Desarrollo - Build & Push a Docker Hub
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Descargar código del repositorio
+        uses: actions/checkout@v3
+
+      - name: 🔑 Iniciar sesión en Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_KENNYCIS }}
+          password: ${{ secrets.DOCKER_KENNYCISPASSWORD }}
+
+      # REGLA 2: Solo aquí se hace el Build y el Push
+      - name: ⚙️ Construir y Subir API Gateway (Nginx)
+        run: |
+          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-api-gateway:dev -f nginx/Dockerfile . || docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-api-gateway:dev ./nginx
+          docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-api-gateway:dev
+
+      - name: 🔐 Construir y Subir Auth Service
+        run: |
+          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:dev ./backend/auth-service || docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:dev ./auth-service
+          docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:dev
+
+      - name: 🏫 Construir y Subir Room Service
+        run: |
+          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev ./backend/room-service || docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev ./room-service
+          docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev
