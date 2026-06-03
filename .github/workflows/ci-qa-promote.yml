@@ -1,0 +1,29 @@
+name: QA - Promoción de Imágenes (Dev -> QA)
+
+# Este robot SOLO se enciende cuando un Pull Request es aprobado y fusionado en la rama 'qa'
+on:
+  push:
+    branches:
+      - qa
+
+jobs:
+  promote-to-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔑 Iniciar sesión en Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_KENNYCIS }}
+          password: ${{ secrets.DOCKER_KENNYCISPASSWORD }}
+
+      - name: 🏷️ Promover Auth Service a QA
+        run: |
+          docker pull ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:dev
+          docker tag ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:dev ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:qa
+          docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:qa
+
+      - name: 🏷️ Promover Room Service a QA
+        run: |
+          docker pull ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev
+          docker tag ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:qa
+          docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:qa
