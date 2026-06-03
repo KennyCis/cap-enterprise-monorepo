@@ -27,3 +27,15 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev ./backend/room-service || docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev ./room-service
           docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev
+
+      # --- LOS 2 NUEVOS MICROSERVICIOS CON LAS RUTAS CORREGIDAS ---
+      
+      - name: 📅 Construir y Subir Reservation Service
+        run: |
+          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-reservation-service:dev ./backend/reservations-service || docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-reservation-service:dev ./reservations-service
+          docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-reservation-service:dev
+
+      - name: 🔔 Construir y Subir Notification Service
+        run: |
+          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:dev ./backend/notifications-service || docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:dev ./notifications-service
+          docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:dev
