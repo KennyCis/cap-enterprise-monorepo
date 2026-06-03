@@ -20,20 +20,20 @@ jobs:
 
       - name: Build and Push Auth Service
         run: |
-          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:dev ./auth-service
+          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:dev ./backend/auth-service || docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:dev ./auth-service
           docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-auth-service:dev
 
       - name: Build and Push Room Service
         run: |
-          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev ./room-service
+          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev ./backend/room-service || docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev ./room-service
           docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:dev
 
       - name: Build and Push Reservation Service
         run: |
-          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-reservation-service:dev ./reservation-service
+          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-reservation-service:dev ./backend/reservations-service || docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-reservation-service:dev ./reservations-service
           docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-reservation-service:dev
 
       - name: Build and Push Notification Service
         run: |
-          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:dev ./notification-service
+          docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:dev ./backend/notifications-service || docker build -t ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:dev ./notifications-service
           docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:dev
