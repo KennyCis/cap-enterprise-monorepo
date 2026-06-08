@@ -24,7 +24,7 @@ jobs:
 
       - name: Promote Room Service
         run: |
-          docker pull ${{ secrets.DOCKER_KENNYర్ణCIS }}/cap-room-service:qa
+          docker pull ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:qa
           docker tag ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:qa ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:prod
           docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-room-service:prod
 
