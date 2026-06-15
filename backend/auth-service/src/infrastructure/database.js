@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+const bcrypt = require('bcryptjs');
 
 // Database pool configuration using environment variables
 const pool = new Pool({
@@ -21,12 +22,21 @@ const initDB = async () => {
             );
         `);
         
-        // Insert default admin user (Note: passwords should be hashed in a real scenario)
-        await pool.query(`
-            INSERT INTO users (email, password, role) 
-            VALUES ('admin@uce.edu.ec', '1234', 'ADMIN') 
-            ON CONFLICT (email) DO NOTHING;
-        `);
+        // Check if admin exists to avoid hashing unnecessarily every time
+        const adminExists = await pool.query(`SELECT id FROM users WHERE email = 'admin@uce.edu.ec'`);
+        
+        if (adminExists.rowCount === 0) {
+            // Hash password securely before inserting
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash('1234', salt);
+            
+            await pool.query(`
+                INSERT INTO users (email, password, role) 
+                VALUES ('admin@uce.edu.ec', $1, 'ADMIN');
+            `, [hashedPassword]);
+            console.log('Admin user created successfully.');
+        }
+
         console.log('PostgreSQL database connected and synchronized successfully.');
     } catch (error) {
         console.error('Error connecting to PostgreSQL:', error.message);
