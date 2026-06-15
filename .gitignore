@@ -1,0 +1,37 @@
+# ==========================================
+# CAP MONOREPO - GLOBAL .GITIGNORE
+# ==========================================
+
+# 1. Seguridad (¡NUNCA SUBIR ESTO!)
+.env
+.env.*
+*.pem
+*.key
+
+# 2. Node.js / Express / React (Auth, Reservations, Notifications, Frontend)
+node_modules/
+npm-debug.log
+yarn-error.log
+dist/
+build/
+.Vite/
+
+# 3. Python / FastAPI (Room Service)
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.pytest_cache/
+
+# 4. Bases de Datos y Docker
+pgdata/
+*.sqlite3
+.docker/
+
+# 5. Archivos del Sistema Operativo y Editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp

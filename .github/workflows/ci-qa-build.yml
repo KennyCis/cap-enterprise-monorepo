@@ -37,13 +37,13 @@ jobs:
       - name: Build and Push Reservations Service
         uses: docker/build-push-action@v5
         with:
-          context: ./backend/reservations-service  # Ajusta si tu ruta es diferente
+          context: ./backend/reservation-service  
           push: true
           tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-reservation-service:qa
 
       - name: Build and Push Notifications Service
         uses: docker/build-push-action@v5
         with:
-          context: ./backend/notifications-service # Ajusta si tu ruta es diferente
+          context: ./backend/notification-service 
           push: true
           tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:qa

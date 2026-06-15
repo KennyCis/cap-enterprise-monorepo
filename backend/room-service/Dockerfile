@@ -11,7 +11,10 @@ RUN apt-get update && apt-get install -y libpq-dev gcc
 COPY . .
 
 # Install Python dependencies directly
-RUN pip install fastapi uvicorn psycopg2-binary pydantic python-dotenv
+RUN pip install fastapi uvicorn psycopg2-binary pydantic python-dotenv sqlalchemy
+
+# 🚀 LA SOLUCIÓN: Le decimos a Python dónde está la raíz de tus módulos
+ENV PYTHONPATH=/app/src
 
 # Expose port
 EXPOSE 8002

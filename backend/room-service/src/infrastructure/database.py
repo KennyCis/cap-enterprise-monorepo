@@ -1,44 +1,29 @@
 import os
-import psycopg2
-from psycopg2.extras import RealDictCursor
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
 from dotenv import load_dotenv
 
+# Load environment variables from .env file
 load_dotenv()
 
-def get_db_connection():
-    try:
-        conn = psycopg2.connect(
-            host=os.getenv("DB_HOST"),
-            port=os.getenv("DB_PORT"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            dbname=os.getenv("DB_NAME")
-        )
-        return conn
-    except Exception as e:
-        print(f"Database connection error: {e}")
-        raise e
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
 
-def init_db():
-    conn = get_db_connection()
-    cursor = conn.cursor()
+# Construct the SQLAlchemy database URL
+SQLALCHEMY_DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
+
+# Dependency to yield database sessions to the controllers
+def get_db():
+    db = SessionLocal()
     try:
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS rooms (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(100) UNIQUE NOT NULL,
-                capacity INTEGER NOT NULL,
-                type VARCHAR(50) NOT NULL,
-                is_active BOOLEAN DEFAULT TRUE
-            );
-        """)
-        conn.commit()
-        print("PostgreSQL database connected and rooms table synchronized.")
-    except Exception as e:
-        print(f"Error synchronizing database: {e}")
+        yield db
     finally:
-        cursor.close()
-        conn.close()
-
-# Initialize the database upon module load
-init_db()
+        db.close()
