@@ -80,19 +80,7 @@ services:
     depends_on:
       - postgres
 
-  # 7. Custom API Gateway (Nginx)
-  nginx-gateway:
-    image: nginx:alpine
-    container_name: cap-api-gateway
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - auth-service
-      - room-service
-
-  # 8. Reservation Microservice (Node.js)
+  # 7. Reservation Microservice (Node.js)
   reservation-service:
     build:
       context: ./backend/reservation-service
@@ -109,7 +97,7 @@ services:
       - postgres
       - kafka
 
-  # 9. Notification Microservice (Node.js)
+  # 8. Notification Microservice (Node.js)
   notification-service:
     build:
       context: ./backend/notification-service
@@ -119,6 +107,27 @@ services:
       - KAFKA_BROKER=kafka:29092
     depends_on:
       - kafka
+
+  # 9. Frontend App (React) - NUEVO SERVICIO
+  frontend-app:
+    build:
+      context: ./frontend/web-app
+    container_name: cap-frontend
+    restart: always
+
+  # 10. Custom API Gateway (Nginx) - ACTUALIZADO
+  nginx-gateway:
+    image: nginx:alpine
+    container_name: cap-api-gateway
+    ports:
+      - "80:80" # <-- Actualizado al puerto web principal
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - auth-service
+      - room-service
+      - reservation-service
+      - frontend-app # <-- Nginx ahora espera a que el frontend exista
 
 volumes:
   pgdata:
