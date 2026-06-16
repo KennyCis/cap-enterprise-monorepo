@@ -1,22 +1,24 @@
-const authUseCase = require('../application/AuthUseCase');
+const AuthUseCase = require('../application/AuthUseCase');
 
 class AuthController {
-    // 1. Controller must receive Express 'req' and 'res' objects
     async login(req, res) {
         try {
-            // 2. Extract the actual email and password strings from the JSON body
             const { email, password } = req.body;
-            
+
+            // Validación básica de entrada
             if (!email || !password) {
                 return res.status(400).json({ error: 'Email and password are required' });
             }
 
-            // 3. Pass only the strings to the Use Case
-            const response = await authUseCase.login(email, password);
-            res.status(200).json(response);
+            // Ejecutar caso de uso
+            const authData = await AuthUseCase.login(email, password);
+            
+            // Retornar respuesta exitosa
+            return res.status(200).json(authData);
             
         } catch (error) {
-            res.status(401).json({ error: error.message });
+            // Atrapa credenciales inválidas o errores de código
+            return res.status(401).json({ error: error.message });
         }
     }
 }

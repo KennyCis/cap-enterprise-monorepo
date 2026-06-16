@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('./AuthController');
+const AuthController = require('./AuthController');
 
-// Login endpoint: POST /api/auth/login
-router.post('/login', authController.login);
+// POST /api/auth/login
+// bind()  'this' 
+router.post('/login', AuthController.login.bind(AuthController));
 
 module.exports = router;

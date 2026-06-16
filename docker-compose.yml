@@ -21,17 +21,19 @@ services:
     ports:
       - "6379:6379"
 
-  # 3. Zookeeper
+  # 3. Zookeeper (Enterprise Confluent)
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:7.4.0
     container_name: cap-zookeeper
+    ports:
+      - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 
-  # 4. Kafka
+  # 4. Kafka (Enterprise Confluent)
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.4.0
     container_name: cap-kafka
     depends_on:
       - zookeeper
@@ -40,7 +42,9 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   # 5. Auth Microservice (Node.js)
@@ -64,6 +68,8 @@ services:
     build:
       context: ./backend/room-service
     container_name: cap-room-service
+    ports:  
+      - "8002:8002" 
     environment:
       - PORT=8002
       - DB_HOST=postgres
@@ -74,17 +80,54 @@ services:
     depends_on:
       - postgres
 
-  # 7. Custom API Gateway (Nginx)
+  # 7. Reservation Microservice (Node.js)
+  reservation-service:
+    build:
+      context: ./backend/reservation-service
+    container_name: cap-reservation-service
+    environment:
+      - PORT=3002
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=admin
+      - DB_PASSWORD=adminpassword
+      - DB_NAME=cap_db
+      - KAFKA_BROKER=kafka:29092
+    depends_on:
+      - postgres
+      - kafka
+
+  # 8. Notification Microservice (Node.js)
+  notification-service:
+    build:
+      context: ./backend/notification-service
+    container_name: cap-notification-service
+    environment:
+      - PORT=3003
+      - KAFKA_BROKER=kafka:29092
+    depends_on:
+      - kafka
+
+  # 9. Frontend App (React) - NUEVO SERVICIO
+  frontend-app:
+    build:
+      context: ./frontend/web-app
+    container_name: cap-frontend
+    restart: always
+
+  # 10. Custom API Gateway (Nginx) - ACTUALIZADO
   nginx-gateway:
     image: nginx:alpine
     container_name: cap-api-gateway
     ports:
-      - "8000:8000"
+      - "80:80" # <-- Actualizado al puerto web principal
     volumes:
       - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - auth-service
       - room-service
+      - reservation-service
+      - frontend-app # <-- Nginx ahora espera a que el frontend exista
 
 volumes:
   pgdata:

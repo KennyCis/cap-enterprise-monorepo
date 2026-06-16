@@ -1,16 +1,42 @@
+import uvicorn
 from fastapi import FastAPI
-from src.infrastructure.room_controller import router as room_router
+from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime
 
-app = FastAPI(title="Room Service API")
+# 1. Import engine and Base to trigger automatic table configuration
+from infrastructure.database import engine, Base
+from infrastructure import models
 
-# Mount routers
-app.include_router(room_router)
+# 2. Import infrastructure routes
+from infrastructure.routes import faculty_routes
+
+# Initialize table definitions in the local PostgreSQL instance
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="CAP Room Service",
+    description="Microservice for Managing UCE Faculties, Buildings, and Classrooms",
+    version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/api/rooms/health")
 def health_check():
     return {
-        "status": "UP",
-        "service": "Room Service",
-        "language": "Python/FastAPI",
-        "architecture": "Hexagonal"
+        "service": "CAP Room Service",
+        "status": "Active",
+        "timestamp": datetime.utcnow().isoformat() + "Z"
     }
+
+# Register routers
+app.include_router(faculty_routes.router)
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8002, reload=True)
