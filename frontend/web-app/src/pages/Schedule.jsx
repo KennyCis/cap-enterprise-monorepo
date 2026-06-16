@@ -69,7 +69,7 @@ export default function Schedule() {
       const token = localStorage.getItem("cap_token");
       
       // POST request to create a new reservation via API Gateway
-      const response = await fetch("http://localhost:8000/api/reservations/", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reservations/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

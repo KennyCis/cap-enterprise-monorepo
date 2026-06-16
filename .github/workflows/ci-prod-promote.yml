@@ -38,4 +38,10 @@ jobs:
         run: |
           docker pull ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:qa
           docker tag ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:qa ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:prod
-          docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:prod
+          docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:prod 
+
+      - name: Promote Frontend App
+        run: |
+          docker pull ${{ secrets.DOCKER_KENNYCIS }}/cap-frontend:qa
+          docker tag ${{ secrets.DOCKER_KENNYCIS }}/cap-frontend:qa ${{ secrets.DOCKER_KENNYCIS }}/cap-frontend:prod
+          docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-frontend:prod

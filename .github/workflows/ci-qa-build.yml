@@ -47,3 +47,10 @@ jobs:
           context: ./backend/notification-service 
           push: true
           tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:qa
+      
+      - name: Build and Push Frontend App
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend/web-app
+          push: true
+          tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-frontend:qa
