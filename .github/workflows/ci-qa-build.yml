@@ -54,3 +54,25 @@ jobs:
           context: ./frontend/web-app
           push: true
           tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-frontend:qa
+
+      - name: Deploy to AWS EC2 (QA Environment)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.AWS_HOST_QA }}
+          username: ubuntu
+          key: ${{ secrets.AWS_SSH_KEY_QA }}
+          script: |
+            # Navigate to the QA project directory
+            cd cap-qa
+            
+            # Pull the newly built QA images from Docker Hub
+            sudo docker-compose pull
+            
+            # Stop currently running containers
+            sudo docker-compose down
+            
+            # Start the updated containers and clean up any orphaned ones
+            sudo docker-compose up -d --remove-orphans
+            
+            # Remove old unused images to save EC2 disk space
+            sudo docker image prune -f
