@@ -1,5 +1,6 @@
+// frontend/web-app/src/pages/Login.jsx
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Building2 } from "lucide-react";
 
 export default function Login() {
@@ -15,20 +16,19 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // API Gateway (Puerto 8000)
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/login/`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Credenciales inválidas");
-      }
+      if (!response.ok) throw new Error(data.error || "Invalid credentials");
 
-      // Save el JWT en localStorage
       localStorage.setItem("cap_token", data.token);
       localStorage.setItem("cap_user", JSON.stringify(data.user));
 
@@ -41,54 +41,61 @@ export default function Login() {
   };
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-zinc-50 font-sans">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg border border-zinc-200 p-8">
-        
+    <div className="flex h-screen items-center justify-center bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900">
+
+      <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-8">
+
         <div className="flex flex-col items-center mb-8">
-          <div className="bg-zinc-900 p-3 rounded-lg mb-4">
-            <Building2 className="text-white" size={32} />
+          <div className="bg-white text-black p-3 rounded-lg mb-4">
+            <Building2 size={28} />
           </div>
-          <h1 className="text-2xl font-bold text-zinc-900">CAP System</h1>
-          <p className="text-sm text-zinc-500 mt-1">Classroom Assignment Platform</p>
+          <h1 className="text-2xl font-bold text-white">CAP Platform</h1>
+          <p className="text-sm text-zinc-300 mt-1">
+            Classroom Assignment System
+          </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm mb-6 border border-red-200 text-center">
+          <div className="bg-red-500/20 text-red-300 p-3 rounded-md text-sm mb-6 border border-red-400">
             {error}
           </div>
         )}
 
         <form onSubmit={handleLogin} className="flex flex-col gap-5">
-          <div>
-            <label className="block text-sm font-medium text-zinc-700 mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-zinc-300 rounded-md focus:outline-none focus:ring-2 focus:ring-zinc-900"
-              required
-            />
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-zinc-700 mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-zinc-300 rounded-md focus:outline-none focus:ring-2 focus:ring-zinc-900"
-              required
-            />
-          </div>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            className="w-full px-4 py-2 rounded-md bg-white/20 text-white placeholder-zinc-300 border border-white/20"
+          />
+
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            className="w-full px-4 py-2 rounded-md bg-white/20 text-white placeholder-zinc-300 border border-white/20"
+          />
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-zinc-900 text-white font-medium py-2.5 rounded-md hover:bg-zinc-800 transition-colors mt-2 disabled:bg-zinc-400"
+            className="bg-white text-black py-2.5 rounded-md font-semibold hover:bg-zinc-200"
           >
             {loading ? "Authenticating..." : "Sign In"}
           </button>
+
         </form>
+
+        <p className="mt-6 text-center text-sm text-zinc-300">
+          Don’t have an account?{" "}
+          <Link to="/register" className="text-white font-semibold underline">
+            Register
+          </Link>
+        </p>
+
       </div>
     </div>
   );

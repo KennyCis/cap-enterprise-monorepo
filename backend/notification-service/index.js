@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require('http');
 const { WebSocketServer } = require('ws');
-try { require('dotenv').config(); } catch {}
+require('dotenv').config();
 const { connectConsumer, setNotifyCallback } = require('./kafkaConsumer');
 
 const app = express();
@@ -78,7 +78,6 @@ app.get('/api/notifications/health', (req, res) => {
   });
 });
 
-// ── Start Server ──────────────────────────────────────────
 const PORT = process.env.PORT || 3003;
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Notification Service + WebSocket running on port ${PORT}`);
