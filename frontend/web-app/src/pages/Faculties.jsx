@@ -40,7 +40,7 @@ export default function Faculties() {
   const fetchFaculties = async () => {
     try {
       const token = localStorage.getItem("cap_token");
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/rooms/faculties/`, {
+      const response = await fetch(`/api/rooms/faculties/`, {
         headers: {
           "Authorization": `Bearer ${token}`
         }
@@ -70,7 +70,7 @@ export default function Faculties() {
 
     try {
       const token = localStorage.getItem("cap_token");
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/rooms/faculties/`, {
+      const response = await fetch('/api/rooms/faculties/',  {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

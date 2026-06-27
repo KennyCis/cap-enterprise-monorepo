@@ -18,7 +18,7 @@ export default function Register() {
 
     try {
       // API Gateway routing for user creation
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register/`, {
+      const response = await fetch(`/api/auth/register/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),

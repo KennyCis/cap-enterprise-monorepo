@@ -34,9 +34,7 @@ export default function Schedule() {
     try {
       const token = localStorage.getItem("cap_token");
       const response = await
-        fetch(
-          `${import.meta.env.VITE_API_URL}/api/reservations/`
-          , {
+        fetch(`/api/reservations/`, {
             headers: { "Authorization": `Bearer ${token}` }
       });
       if (!response.ok) throw new Error("Network response was not ok");
@@ -59,7 +57,7 @@ export default function Schedule() {
     setIsSubmitting(true);
     try {
       const token = localStorage.getItem("cap_token");
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reservations/`, {
+      const response = await fetch('/api/reservations/', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
