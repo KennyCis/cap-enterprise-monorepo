@@ -1,3 +1,4 @@
+import os
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,8 +11,8 @@ from infrastructure import models
 # 2. Import infrastructure routes
 from infrastructure.routes import faculty_routes
 
-# Initialize table definitions in the local PostgreSQL instance
-Base.metadata.create_all(bind=engine)
+if os.getenv("TESTING") != "True":
+    Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="CAP Room Service",
