@@ -1,0 +1,8 @@
+// backend/notification-service/jest.config.js
+module.exports = {
+  testEnvironment: 'node',
+  testMatch: ['**/__tests__/**/*.js', '**/?(*.)+(spec|test).js'],
+  verbose: true,
+  forceExit: true,
+  clearMocks: true,
+};
