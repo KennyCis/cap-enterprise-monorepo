@@ -80,6 +80,14 @@ app.get('/api/notifications/health', (req, res) => {
 
 // ── Start Server ──────────────────────────────────────────
 const PORT = process.env.PORT || 3003;
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Notification Service + WebSocket running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+
+  setNotifyCallback(notifyUser, broadcastAll);
+  connectConsumer();
+  
+  server.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Notification Service + WebSocket running on port ${PORT}`);
+  });
+
+}
+module.exports = { app, server };
