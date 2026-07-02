@@ -110,6 +110,31 @@ services:
     depends_on:
       - kafka
 
+<<<<<<< Updated upstream
+=======
+  # 11. Audit Microservice (Go)
+  audit-service:
+    build:
+      context: ./backend/audit-service
+    container_name: cap-audit-service
+    environment:
+      - KAFKA_BROKERS=kafka:29092
+      - CASSANDRA_HOSTS=127.0.0.1 
+    depends_on:
+      - kafka
+
+  # 12. RabbitMQ (Message Broker para Tareas Pesadas)
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: cap-rabbitmq
+    ports:
+      - "5672:5672"   
+      - "15672:15672" 
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: adminpassword
+
+>>>>>>> Stashed changes
   # 9. Frontend App (React) - NUEVO SERVICIO
   frontend-app:
     build:
