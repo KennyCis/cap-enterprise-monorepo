@@ -48,3 +48,27 @@ func (r *cassandraRepository) SaveLog(ctx context.Context, auditLog *domain.Audi
 
 	return nil
 }
+
+// GetLogs retrieves the most recent audit logs from the Cassandra database.
+func (r *cassandraRepository) GetLogs(ctx context.Context) ([]domain.AuditLog, error) {
+	var logs []domain.AuditLog
+	
+	// Query to get the latest logs (in production, add pagination or LIMIT)
+	query := `SELECT id, event_type, payload, timestamp, source FROM audit_logs LIMIT 50`
+	scanner := r.session.Query(query).WithContext(ctx).Iter().Scanner()
+
+	for scanner.Next() {
+		var log domain.AuditLog
+		err := scanner.Scan(&log.ID, &log.EventType, &log.Payload, &log.Timestamp, &log.Source)
+		if err != nil {
+			return nil, err
+		}
+		logs = append(logs, log)
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return logs, nil
+}
