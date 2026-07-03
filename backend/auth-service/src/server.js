@@ -33,4 +33,4 @@ if (process.env.NODE_ENV !== 'test') {
     });
 }
 
-mmodule.exports = app;
+module.exports = app;
