@@ -41,6 +41,12 @@ jobs:
           docker tag ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:qa ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:prod
           docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:prod 
 
+      - name: Promote Audit Service
+        run: |
+          docker pull ${{ secrets.DOCKER_KENNYCIS }}/cap-audit-service:qa
+          docker tag ${{ secrets.DOCKER_KENNYCIS }}/cap-audit-service:qa ${{ secrets.DOCKER_KENNYCIS }}/cap-audit-service:prod
+          docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-audit-service:prod
+      
       - name: Promote Frontend App
         run: |
           docker pull ${{ secrets.DOCKER_KENNYCIS }}/cap-frontend:qa

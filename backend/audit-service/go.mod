@@ -1,6 +1,6 @@
 module cap/audit-service
 
-go 1.26.4
+go 1.23
 
 require (
 	github.com/gocql/gocql v1.7.0 // indirect

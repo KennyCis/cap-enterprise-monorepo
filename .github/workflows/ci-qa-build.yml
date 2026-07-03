@@ -48,6 +48,13 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-notification-service:qa
       
+      - name: Build and Push Audit Service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/audit-service
+          push: true
+          tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-audit-service:qa
+      
       - name: Build and Push Frontend App
         uses: docker/build-push-action@v5
         with:
