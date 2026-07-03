@@ -27,4 +27,4 @@ if (process.env.NODE_ENV !== 'test') {
     });
 }
 
-module.exports = { app, server };
+module.exports = app;
