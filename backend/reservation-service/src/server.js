@@ -22,8 +22,8 @@ app.use('/api/reservations', reservationRoutes);
 
 const PORT = process.env.PORT || 3002;
 if (process.env.NODE_ENV !== 'test') {
-    server.listen(PORT, '0.0.0.0', () => {
-        console.log(`🚀 Reservation Service running on http://localhost:${PORT}`);
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`🚀 Reservation Service running on ${PORT}`);
     });
 }
 
