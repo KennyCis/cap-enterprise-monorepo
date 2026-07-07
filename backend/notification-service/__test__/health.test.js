@@ -6,7 +6,7 @@ describe('Notification Service API', () => {
   
 
   describe('GET /api/notifications/health', () => {
-    it('debería responder con status 200 y decir que el servicio está UP', async () => {
+    it('should respond with status 200 and indicate service is UP', async () => {
       
       const response = await request(app).get('/api/notifications/health');
       
