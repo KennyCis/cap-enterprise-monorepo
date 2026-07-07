@@ -64,9 +64,6 @@ const broadcastAll = (payload) => {
   console.log(`📢 Broadcast sent to ${count} client(s)`);
 };
 
-// Inject callbacks into Kafka consumer
-setNotifyCallback(notifyUser, broadcastAll);
-connectConsumer();
 
 // ── Health Check ──────────────────────────────────────────
 app.get('/api/notifications/health', (req, res) => {
