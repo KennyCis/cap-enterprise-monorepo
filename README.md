@@ -18,6 +18,10 @@ The platform leverages a Polyglot Microservices Architecture, asynchronous messa
 * **Database (PostgreSQL):** Isolated relational data persistence layer with robust volume management.
 * **CI/CD Pipeline (GitHub Actions):** Automated workflows for code linting, building, and pushing Docker images to Docker Hub upon merges to the `develop` and `main` branches.
 
+### Architecture Stack Update
+* **Notification Service:** Migrated from **Go** to **Node.js (Express & ws)**.
+  * **Rationale:** Time-to-market optimization and rapid prototyping. Node.js provides a robust, native asynchronous event-driven ecosystem that integrates seamlessly with our WebSocket requirements and Kafka consumer logic, ensuring real-time capabilities without compromising delivery deadlines.
+
 ### Tech Stack
 * **Frontend:** React 19, Vite, Tailwind CSS v4, Shadcn/ui, React Router
 * **Backend:** Node.js (Express), Python 3.10 (FastAPI), Pydantic, SQLAlchemy

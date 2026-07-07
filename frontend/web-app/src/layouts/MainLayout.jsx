@@ -5,14 +5,14 @@ import {
   CalendarDays,
   Settings,
   UserCircle,
+  ShieldCheck,
+  DatabaseBackup,
 } from "lucide-react";
 
 export default function MainLayout() {
   const location = useLocation();
 
-  
   const user = JSON.parse(localStorage.getItem("cap_user") || "{}");
-
 
   const isActive = (path) => location.pathname === path;
 
@@ -85,6 +85,46 @@ export default function MainLayout() {
             />
             <span className="font-medium text-sm">Schedule</span>
           </Link>
+
+          {/* ================= SYSTEM MANAGEMENT ================= */}
+          <div className="mt-4 mb-1 border-t border-zinc-800/50 pt-5">
+            <p className="px-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">
+              System Mgmt
+            </p>
+          </div>
+
+          {/* Audit */}
+          <Link
+            to="/audit"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+              isActive("/audit")
+                ? "bg-zinc-800 text-white shadow-sm"
+                : "hover:bg-zinc-800/50 hover:text-zinc-100"
+            }`}
+          >
+            <ShieldCheck
+              size={18}
+              className={isActive("/audit") ? "text-blue-400" : ""}
+            />
+            <span className="font-medium text-sm">Security Audit</span>
+          </Link>
+
+          {/* Backups */}
+          <Link
+            to="/backups"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+              isActive("/backups")
+                ? "bg-zinc-800 text-white shadow-sm"
+                : "hover:bg-zinc-800/50 hover:text-zinc-100"
+            }`}
+          >
+            <DatabaseBackup
+              size={18}
+              className={isActive("/backups") ? "text-blue-400" : ""}
+            />
+            <span className="font-medium text-sm">Cloud Backups</span>
+          </Link>
+
         </nav>
 
         {/* ================= FOOTER / USER ================= */}
@@ -101,7 +141,6 @@ export default function MainLayout() {
             <UserCircle size={24} className="text-zinc-400" />
             <div className="flex flex-col">
 
-              {/* ✅ Usuario dinámico */}
               <span className="text-sm font-medium text-zinc-200">
                 {user.email || "User"}
               </span>

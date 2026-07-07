@@ -27,7 +27,10 @@ app.get('/api/auth/health', (req, res) => {
 
 const PORT = process.env.PORT || 3001;
 
-// Binding explicitly to 0.0.0.0 is MANDATORY for Docker containers
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Auth Service running on http://0.0.0.0:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`🚀 Reservation Service running on ${PORT}`);
+    });
+}
+
+module.exports = app;

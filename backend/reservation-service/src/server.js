@@ -21,6 +21,10 @@ app.get('/api/reservations/health', (req, res) => {
 app.use('/api/reservations', reservationRoutes);
 
 const PORT = process.env.PORT || 3002;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Reservation Service running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`🚀 Reservation Service running on ${PORT}`);
+    });
+}
+
+module.exports = app;
