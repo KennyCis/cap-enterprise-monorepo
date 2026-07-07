@@ -11,7 +11,7 @@ const Audit = () => {
     setError(null);
     try {
       // Assuming your Go service is exposed on port 8080 via Docker or Local
-      const response = await fetch('http://localhost:8080/api/audit');
+      const response = await fetch('/api/audit');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
