@@ -141,6 +141,8 @@ jobs:
           script: |
             # Navigate to the QA project directory
             cd cap-qa
+
+            git pull origin qa
             
             # Pull the newly built QA images from Docker Hub
             sudo docker-compose pull
