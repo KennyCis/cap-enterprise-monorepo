@@ -62,6 +62,19 @@ services:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: adminpassword
 
+  cap-mysql:
+    image: mysql:8.0
+    container_name: cap-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: cap_schedule
+      MYSQL_USER: cap_user
+      MYSQL_PASSWORD: cap_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_schedule_data:/var/lib/mysql
+  
   auth-service:
     build:
       context: ./backend/auth-service
@@ -146,6 +159,20 @@ services:
     depends_on:
       - cap-rabbitmq
 
+  cap-schedule-service:
+    build:
+      context: ./backend/schedule-service
+      dockerfile: Dockerfile
+    container_name: cap-schedule-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://cap-mysql:3306/cap_schedule?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=cap_user
+      - SPRING_DATASOURCE_PASSWORD=cap_password
+    depends_on:
+      - cap-mysql
+  
   frontend-app:
     build:
       context: ./frontend/web-app
@@ -167,3 +194,4 @@ services:
 
 volumes:
   pgdata:
+  mysql_schedule_data:
