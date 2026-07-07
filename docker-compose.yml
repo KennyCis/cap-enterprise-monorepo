@@ -1,7 +1,5 @@
-version: '3.8'
-
 services:
-  # 1. Base de Datos
+
   postgres:
     image: postgres:15-alpine
     container_name: cap-postgres
@@ -14,14 +12,21 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  # 2. Redis
   redis:
     image: redis:7-alpine
     container_name: cap-redis
     ports:
       - "6379:6379"
 
-  # 3. Zookeeper (Enterprise Confluent)
+  cap-cassandra:
+    image: cassandra:latest
+    container_name: cap-cassandra
+    restart: unless-stopped
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=CAP_Cluster
+  
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
     container_name: cap-zookeeper
@@ -31,7 +36,6 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 
-  # 4. Kafka (Enterprise Confluent)
   kafka:
     image: confluentinc/cp-kafka:7.4.0
     container_name: cap-kafka
@@ -47,7 +51,17 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
-  # 5. Auth Microservice (Node.js)
+  cap-rabbitmq:
+    image: rabbitmq:3-management
+    container_name: cap-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672" 
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: adminpassword
+
   auth-service:
     build:
       context: ./backend/auth-service
@@ -63,7 +77,6 @@ services:
     depends_on:
       - postgres
 
-  # 6. Room Microservice (Python)
   room-service:
     build:
       context: ./backend/room-service
@@ -80,7 +93,6 @@ services:
     depends_on:
       - postgres
 
-  # 7. Reservation Microservice (Node.js)
   reservation-service:
     build:
       context: ./backend/reservation-service
@@ -97,7 +109,6 @@ services:
       - postgres
       - kafka
 
-  # 8. Notification Microservice (Node.js)
   notification-service:
     build:
       context: ./backend/notification-service
@@ -110,50 +121,49 @@ services:
     depends_on:
       - kafka
 
-
-  # 11. Audit Microservice (Go)s
   audit-service:
     build:
       context: ./backend/audit-service
     container_name: cap-audit-service
+    ports:
+      - "8080:8080" 
     environment:
       - KAFKA_BROKERS=kafka:29092
-      - CASSANDRA_HOSTS=127.0.0.1 
+      - CASSANDRA_HOSTS=cap-cassandra 
     depends_on:
       - kafka
+      - cap-cassandra
 
-  # 12. RabbitMQ (Message Broker para Tareas Pesadas)
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: cap-rabbitmq
-    ports:
-      - "5672:5672"   
-      - "15672:15672" 
+  backup-service:
+    build: 
+      context: ./backend/backup-service
+      dockerfile: Dockerfile
+    container_name: cap-backup-service
+    restart: unless-stopped
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: adminpassword
+      - RABBITMQ_URL=amqp://admin:adminpassword@cap-rabbitmq:5672/
+      - R2_ACCOUNT_ID=local_account_id
+    depends_on:
+      - cap-rabbitmq
 
-
-  # 9. Frontend App (React) - NUEVO SERVICIO
   frontend-app:
     build:
       context: ./frontend/web-app
     container_name: cap-frontend
     restart: always
 
-  # 10. Custom API Gateway (Nginx) - ACTUALIZADO
   nginx-gateway:
     image: nginx:alpine
     container_name: cap-api-gateway
     ports:
-      - "80:80" # <-- Actualizado al puerto web principal
+      - "80:80" 
     volumes:
       - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - auth-service
       - room-service
       - reservation-service
-      - frontend-app # <-- Nginx ahora espera a que el frontend exista
+      - frontend-app
 
 volumes:
   pgdata:

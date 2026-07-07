@@ -7,6 +7,10 @@ import Schedule from "./pages/Schedule";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
+// NEW MODULES IMPORTED HERE
+import Backups from "./pages/Backups";
+import Audit from "./pages/Audit"; 
+
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -31,6 +35,10 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="faculties" element={<Faculties />} />
           <Route path="schedule" element={<Schedule />} />
+          
+          {/* SYSTEM MANAGEMENT ROUTES */}
+          <Route path="audit" element={<Audit />} />
+          <Route path="backups" element={<Backups />} />
         </Route>
 
       </Routes>

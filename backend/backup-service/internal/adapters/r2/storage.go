@@ -12,15 +12,15 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-// R2Adapter implementa domain.StoragePort
+// R2Adapter implements domain.StoragePort
 type R2Adapter struct {
 	client     *s3.Client
 	bucketName string
+	accountID  string
 }
 
-// NewR2Adapter inicializa la conexión con Cloudflare R2 o AWS S3
+// NewR2Adapter initializes the connection with Cloudflare R2 or AWS S3
 func NewR2Adapter(accountId, accessKey, secretKey, bucketName string) *R2Adapter {
-	// Cloudflare R2 usa esta estructura de URL: https://<ACCOUNT_ID>.r2.cloudflarestorage.com
 	r2Resolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
 		return aws.Endpoint{
 			URL: fmt.Sprintf("https://%s.r2.cloudflarestorage.com", accountId),
@@ -30,27 +30,34 @@ func NewR2Adapter(accountId, accessKey, secretKey, bucketName string) *R2Adapter
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
 		config.WithEndpointResolverWithOptions(r2Resolver),
 		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKey, secretKey, "")),
-		config.WithRegion("auto"), // R2 usa 'auto' como región
+		config.WithRegion("auto"), // R2 uses 'auto' as region
 	)
 	if err != nil {
-		log.Fatalf("❌ Error cargando configuración de R2: %v", err)
+		log.Fatalf("❌ Error loading R2 configuration: %v", err)
 	}
 
 	return &R2Adapter{
 		client:     s3.NewFromConfig(cfg),
 		bucketName: bucketName,
+		accountID:  accountId,
 	}
 }
 
-// UploadBackup sube el archivo .sql a la nube
+// UploadBackup uploads the .sql file to the cloud
 func (r *R2Adapter) UploadBackup(filePath string, fileName string) error {
+	if r.accountID == "local_account_id" {
+		log.Println("⚠️ [Mock Mode] Local environment detected. Bypassing real AWS/R2 network call.")
+		log.Printf("☁️ Uploading [%s] to mock Cloudflare R2 bucket...", fileName)
+		log.Println("✅ Backup uploaded successfully to Cloud storage (Simulated)")
+		return nil
+	}
 	file, err := os.Open(filePath)
 	if err != nil {
-		return fmt.Errorf("no se pudo abrir el archivo de backup: %v", err)
+		return fmt.Errorf("could not open backup file: %v", err)
 	}
 	defer file.Close()
 
-	log.Printf("☁️ Subiendo [%s] a Cloudflare R2...", fileName)
+	log.Printf("☁️ Uploading [%s] to Cloudflare R2...", fileName)
 
 	_, err = r.client.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket: aws.String(r.bucketName),
@@ -59,9 +66,9 @@ func (r *R2Adapter) UploadBackup(filePath string, fileName string) error {
 	})
 
 	if err != nil {
-		return fmt.Errorf("error subiendo a R2: %v", err)
+		return fmt.Errorf("error uploading to R2: %v", err)
 	}
 
-	log.Println("✅ Backup subido exitosamente a la nube R2")
+	log.Println("✅ Backup uploaded successfully to R2 cloud")
 	return nil
 }

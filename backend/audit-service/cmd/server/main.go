@@ -17,19 +17,30 @@ import (
 func main() {
 	log.Println("🚀 Starting CAP Audit Service in Golang...")
 
+	// --- 0. LEER VARIABLES DE ENTORNO DE DOCKER ---
+	cassandraHost := os.Getenv("CASSANDRA_HOSTS")
+	if cassandraHost == "" {
+		cassandraHost = "127.0.0.1" // 
+	}
+
+	kafkaBroker := os.Getenv("KAFKA_BROKERS")
+	if kafkaBroker == "" {
+		kafkaBroker = "localhost:9092"
+	}
+	
 	// 1. Initialize Cassandra Adapter (Right side of the Hexagon - storage)
 	log.Println("⚡ Preparing connection to DataStax Cassandra...")
-	cassandraHosts := []string{"127.0.0.1"}
+	cassandraHosts := []string{cassandraHost}
 	keyspace := "cap_audit"
 
 	repo, err := cassandra.NewCassandraRepository(cassandraHosts, keyspace)
 	if err != nil {
-		log.Printf("⚠️ Warning: Could not connect to Cassandra (is it running?): %v", err)
+		log.Fatalf("❌ Fatal: Could not connect to Cassandra: %v", err)
 	}
 
 	// 2. Initialize Kafka Adapter (Left side of the Hexagon - consuming events)
-	log.Println("🎧 Connecting to Apache Kafka broker...")
-	kafkaBrokers := []string{"localhost:9092"}
+	log.Printf("🎧 Connecting to Apache Kafka broker at %s...", kafkaBroker)
+	kafkaBrokers := []string{kafkaBroker}
 	topic := "booking.created" // Example topic to listen to
 	groupID := "audit-service-group"
 

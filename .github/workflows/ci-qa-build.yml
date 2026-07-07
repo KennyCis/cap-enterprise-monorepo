@@ -1,4 +1,4 @@
-name: QA - Build & Push Docker Images
+name: QA - Test, Build & Push Docker Images
 
 on:
   push:
@@ -6,13 +6,72 @@ on:
       - qa
 
 jobs:
-  build-and-push-qa:
-    name: Build and Push QA Images
+  test-build-push-qa:
+    name: Test, Build and Push QA
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
+
+      # ==========================================
+      # 1. AUTOMATED TESTING PHASE (CI)
+      # ==========================================
+      
+      # --- Node.js Tests ---
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Auth Service Tests
+        working-directory: ./backend/auth-service
+        run: |
+          npm install
+          npm test --passWithNoTests
+
+      - name: Run Notification Service Tests
+        working-directory: ./backend/notification-service
+        run: |
+          npm install
+          npm test --passWithNoTests
+
+      - name: Run Reservation Service Tests
+        working-directory: ./backend/reservation-service
+        run: |
+          npm install
+          npm test --passWithNoTests
+
+      # --- Python Tests ---
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Run Room Service Tests
+        working-directory: ./backend/room-service
+        run: |
+          pip install -r requirements.txt
+          pip install pytest httpx
+          pytest
+
+      # --- Golang Tests ---
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24'
+
+      - name: Run Audit Service Tests
+        working-directory: ./backend/audit-service
+        run: go test ./... -v
+
+      - name: Run Backup Service Tests
+        working-directory: ./backend/backup-service
+        run: go test ./... -v
+
+      # ==========================================
+      # 2. BUILD & PUSH PHASE (CD)
+      # ==========================================
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -54,6 +113,13 @@ jobs:
           context: ./backend/audit-service
           push: true
           tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-audit-service:qa
+
+      - name: Build and Push Backup Service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/backup-service
+          push: true
+          tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-backup-service:qa
       
       - name: Build and Push Frontend App
         uses: docker/build-push-action@v5
@@ -61,6 +127,10 @@ jobs:
           context: ./frontend/web-app
           push: true
           tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-frontend:qa
+
+      # ==========================================
+      # 3. DEPLOYMENT PHASE (AWS EC2)
+      # ==========================================
 
       - name: Deploy to AWS EC2 (QA Environment)
         uses: appleboy/ssh-action@v1.0.3
