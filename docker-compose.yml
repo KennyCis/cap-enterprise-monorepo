@@ -159,7 +159,7 @@ services:
     depends_on:
       - cap-rabbitmq
 
-  cap-schedule-service:
+  schedule-service:
     build:
       context: ./backend/schedule-service
       dockerfile: Dockerfile
@@ -190,6 +190,10 @@ services:
       - auth-service
       - room-service
       - reservation-service
+      - notification-service
+      - audit-service
+      - backup-service
+      - schedule-service
       - frontend-app
 
 volumes:
