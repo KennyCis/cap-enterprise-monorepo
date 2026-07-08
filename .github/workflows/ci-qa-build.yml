@@ -69,6 +69,20 @@ jobs:
         working-directory: ./backend/backup-service
         run: go test ./... -v
 
+      # --- Java (Spring Boot) Tests & Build ---
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Compile Schedule Service
+        working-directory: ./backend/schedule-service
+        run: |
+          chmod +x ./mvnw
+          ./mvnw clean package -DskipTests
+
       # ==========================================
       # 2. BUILD & PUSH PHASE (CD)
       # ==========================================
@@ -120,6 +134,13 @@ jobs:
           context: ./backend/backup-service
           push: true
           tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-backup-service:qa
+          
+      - name: Build and Push Schedule Service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/schedule-service
+          push: true
+          tags: ${{ secrets.DOCKER_KENNYCIS }}/cap-schedule-service:qa
       
       - name: Build and Push Frontend App
         uses: docker/build-push-action@v5
