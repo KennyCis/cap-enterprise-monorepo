@@ -7,6 +7,7 @@ import {
   UserCircle,
   ShieldCheck,
   DatabaseBackup,
+  Clock,
 } from "lucide-react";
 
 export default function MainLayout() {
@@ -84,6 +85,22 @@ export default function MainLayout() {
               className={isActive("/schedule") ? "text-blue-400" : ""}
             />
             <span className="font-medium text-sm">Schedule</span>
+          </Link>
+
+          {/* Class Schedules (Java Service) */}
+          <Link
+            to="/schedules"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+              isActive("/schedules")
+                ? "bg-zinc-800 text-white shadow-sm"
+                : "hover:bg-zinc-800/50 hover:text-zinc-100"
+            }`}
+          >
+            <Clock
+              size={18}
+              className={isActive("/schedules") ? "text-blue-400" : ""}
+            />
+            <span className="font-medium text-sm">Class Schedules</span>
           </Link>
 
           {/* ================= SYSTEM MANAGEMENT ================= */}
