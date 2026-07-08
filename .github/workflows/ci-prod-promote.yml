@@ -53,6 +53,12 @@ jobs:
           docker tag ${{ secrets.DOCKER_KENNYCIS }}/cap-backup-service:qa ${{ secrets.DOCKER_KENNYCIS }}/cap-backup-service:prod
           docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-backup-service:prod
       
+      - name: Promote Schedule Service
+        run: |
+          docker pull ${{ secrets.DOCKER_KENNYCIS }}/cap-schedule-service:qa
+          docker tag ${{ secrets.DOCKER_KENNYCIS }}/cap-schedule-service:qa ${{ secrets.DOCKER_KENNYCIS }}/cap-schedule-service:prod
+          docker push ${{ secrets.DOCKER_KENNYCIS }}/cap-schedule-service:prod
+      
       - name: Promote Frontend App
         run: |
           docker pull ${{ secrets.DOCKER_KENNYCIS }}/cap-frontend:qa
