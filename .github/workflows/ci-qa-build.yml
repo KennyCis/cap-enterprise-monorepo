@@ -83,6 +83,14 @@ jobs:
           chmod +x ./mvnw
           ./mvnw clean package -DskipTests
 
+      # --- SonarQube Analysis (SAST & SCA) ---
+      
+      - name: SonarQube Scan (SCA & SAST)
+        uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
       # ==========================================
       # 2. BUILD & PUSH PHASE (CD)
       # ==========================================
