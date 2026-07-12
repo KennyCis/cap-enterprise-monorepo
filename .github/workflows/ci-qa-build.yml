@@ -83,8 +83,25 @@ jobs:
           chmod +x ./mvnw
           ./mvnw clean package -DskipTests
 
-      # --- SonarQube Analysis (SAST & SCA) ---
-      
+      # ==========================================
+      # --- SEGURIDAD: OWASP Y SONARQUBE ---
+      # ==========================================
+
+      # 1. OWASP Dependency-Check (SCA)
+      - name: Run OWASP Dependency-Check
+        uses: dependency-check/Dependency-Check_Action@main
+        env:
+          JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.10-7/x64
+        with:
+          project: 'CAP Classroom Assignment Platform'
+          path: '.'
+          format: 'ALL'
+          out: 'reports'
+          args: >
+            --nvdApiKey ${{ secrets.NVD_API_KEY }}
+            --disableAssembly
+
+      # 2. SonarQube Analysis (SAST & Consumo del reporte SCA)
       - name: SonarQube Scan (SCA & SAST)
         uses: SonarSource/sonarqube-scan-action@master
         env:
